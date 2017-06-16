@@ -1,0 +1,733 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "zoneepsubhashin": {
+      "Type": "AWS::Route53::HostedZone",
+      "Properties": {
+        "Name": "epsubhash.in.",
+        "HostedZoneConfig": {
+          "Comment": "epsubhash in"
+        }
+      }
+    },
+    "dnsep25epsubhashin": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "zoneepsubhashin"
+        },
+        "RecordSets": [
+          {
+            "Name": "ep25.epsubhash.in.",
+            "Type": "A",
+            "AliasTarget": {
+              "HostedZoneId": "Z32O12XQLNTSW2",
+              "DNSName": "dualstack.ep25-elb-1142015484.eu-west-1.elb.amazonaws.com"
+            }
+          }
+        ]
+      }
+    },
+    "vpc00e83767": {
+      "Type": "AWS::EC2::VPC",
+      "Properties": {
+        "CidrBlock": "10.0.0.0/16",
+        "InstanceTenancy": "default",
+        "EnableDnsSupport": "true",
+        "EnableDnsHostnames": "true",
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-myvpc"
+          }
+        ]
+      }
+    },
+    "subnetaef52de7": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.2.0/24",
+        "AvailabilityZone": "eu-west-1b",
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-B-PRIVATE-SUBNET"
+          }
+        ]
+      }
+    },
+    "subnet253ae842": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.3.0/24",
+        "AvailabilityZone": "eu-west-1a",
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-A-PUBLIC-SUBNET"
+          }
+        ]
+      }
+    },
+    "subnetbff22af6": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.4.0/24",
+        "AvailabilityZone": "eu-west-1b",
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-B-PUBLIC-SUBNET"
+          }
+        ]
+      }
+    },
+    "subneta835e7cf": {
+      "Type": "AWS::EC2::Subnet",
+      "Properties": {
+        "CidrBlock": "10.0.1.0/24",
+        "AvailabilityZone": "eu-west-1a",
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-A-PRIVATE-SUBNET"
+          }
+        ]
+      }
+    },
+    "igw06156f62": {
+      "Type": "AWS::EC2::InternetGateway",
+      "Properties": {
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-IGW"
+          }
+        ]
+      }
+    },
+    "doptcf854eab": {
+      "Type": "AWS::EC2::DHCPOptions",
+      "Properties": {
+        "DomainName": "eu-west-1.compute.internal",
+        "DomainNameServers": [
+          "AmazonProvidedDNS"
+        ]
+      }
+    },
+    "acl44523023": {
+      "Type": "AWS::EC2::NetworkAcl",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        }
+      }
+    },
+    "rtb03436964": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-NAT-RT"
+          }
+        ]
+      }
+    },
+    "rtb2a755f4d": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-B-RT"
+          }
+        ]
+      }
+    },
+    "rtb2a765c4d": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-myvpc-MAIN-RT"
+          }
+        ]
+      }
+    },
+    "rtb78745e1f": {
+      "Type": "AWS::EC2::RouteTable",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-A-RT"
+          }
+        ]
+      }
+    },
+    "asgep25ASG02": {
+      "Type": "AWS::AutoScaling::AutoScalingGroup",
+      "Properties": {
+        "AvailabilityZones": [
+          "eu-west-1b",
+          "eu-west-1a"
+        ],
+        "Cooldown": "300",
+        "DesiredCapacity": "0",
+        "HealthCheckGracePeriod": "60",
+        "HealthCheckType": "EC2",
+        "MaxSize": "0",
+        "MinSize": "0",
+        "VPCZoneIdentifier": [
+          {
+            "Ref": "subnet253ae842"
+          },
+          {
+            "Ref": "subnetbff22af6"
+          }
+        ],
+        "LaunchConfigurationName": {
+          "Ref": "lcep25LC02"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-ASG-02",
+            "PropagateAtLaunch": true
+          }
+        ],
+        "TerminationPolicies": [
+          "Default"
+        ]
+      }
+    },
+    "lcep25LC01": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": "ami-dcc3dcba",
+        "InstanceType": "t2.micro",
+        "SecurityGroups": [
+          {
+            "Ref": "sgep25WORDPRESSSG"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "SnapshotId": "snap-09db3d9f8f7f1fdd6",
+              "VolumeSize": 8
+            }
+          }
+        ]
+      }
+    },
+    "lcep25LC02": {
+      "Type": "AWS::AutoScaling::LaunchConfiguration",
+      "Properties": {
+        "ImageId": "ami-e04e5086",
+        "InstanceType": "t2.micro",
+        "SecurityGroups": [
+          {
+            "Ref": "sgep25WORDPRESSSG"
+          }
+        ],
+        "BlockDeviceMappings": [
+          {
+            "DeviceName": "/dev/sda1",
+            "Ebs": {
+              "SnapshotId": "snap-01283d336f74c4f06",
+              "VolumeSize": 8
+            }
+          }
+        ]
+      }
+    },
+    "dbsubnetep25subnetgroup": {
+      "Type": "AWS::RDS::DBSubnetGroup",
+      "Properties": {
+        "DBSubnetGroupDescription": "ep25 SUBNET GROUP",
+        "SubnetIds": [
+          {
+            "Ref": "subneta835e7cf"
+          },
+          {
+            "Ref": "subnetaef52de7"
+          }
+        ]
+      }
+    },
+    "topicep25note": {
+      "Type": "AWS::SNS::Topic",
+      "Properties": {
+        "DisplayName": "ep25-note",
+        "Subscription": [
+          {
+            "Endpoint": "nithu.bhu@gmail.com",
+            "Protocol": "email"
+          }
+        ]
+      }
+    },
+    "sgdefault": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "default VPC security group",
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-MYVPC-DEFAULT-SG"
+          }
+        ]
+      }
+    },
+    "sgep25WORDPRESSSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "ep25 WORDPRESS SG",
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-WORDPRESS-SG"
+          }
+        ]
+      }
+    },
+    "sgep25MYSQLSG": {
+      "Type": "AWS::EC2::SecurityGroup",
+      "Properties": {
+        "GroupDescription": "ep25 MYSQL SG",
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "Tags": [
+          {
+            "Key": "Name",
+            "Value": "ep25-MYSQL-SG"
+          }
+        ]
+      }
+    },
+    "snspolicyep25note": {
+      "Type": "AWS::SNS::TopicPolicy",
+      "Properties": {
+        "Topics": [
+          {
+            "Ref": "topicep25note"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2008-10-17",
+          "Id": "__default_policy_ID",
+          "Statement": [
+            {
+              "Sid": "__default_statement_ID",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": "*"
+              },
+              "Action": [
+                "SNS:GetTopicAttributes",
+                "SNS:SetTopicAttributes",
+                "SNS:AddPermission",
+                "SNS:RemovePermission",
+                "SNS:DeleteTopic",
+                "SNS:Subscribe",
+                "SNS:ListSubscriptionsByTopic",
+                "SNS:Publish",
+                "SNS:Receive"
+              ],
+              "Resource": {
+                "Ref": "topicep25note"
+              },
+              "Condition": {
+                "StringEquals": {
+                  "AWS:SourceOwner": "438317763711"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "scalingep25DecreaseGroupSize": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "AdjustmentType": "ChangeInCapacity",
+        "PolicyType": "StepScaling",
+        "StepAdjustments": [
+          {
+            "ScalingAdjustment": -1,
+            "MetricIntervalUpperBound": 0.0
+          }
+        ],
+        "AutoScalingGroupName": {
+          "Ref": "asgep25ASG02"
+        }
+      }
+    },
+    "scalingep25IncreaseGroupSize": {
+      "Type": "AWS::AutoScaling::ScalingPolicy",
+      "Properties": {
+        "AdjustmentType": "ChangeInCapacity",
+        "PolicyType": "StepScaling",
+        "StepAdjustments": [
+          {
+            "ScalingAdjustment": 1,
+            "MetricIntervalLowerBound": 0.0
+          }
+        ],
+        "AutoScalingGroupName": {
+          "Ref": "asgep25ASG02"
+        }
+      }
+    },
+    "alarmep25ASG02HighNetworkIn": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ActionsEnabled": "true",
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "EvaluationPeriods": "1",
+        "MetricName": "NetworkIn",
+        "Namespace": "AWS/EC2",
+        "Period": "300",
+        "Statistic": "Maximum",
+        "Threshold": "150000.0",
+        "AlarmActions": [
+          {
+            "Ref": "scalingep25IncreaseGroupSize"
+          },
+          "arn:aws:sns:eu-west-1:438317763711:ep25-note"
+        ],
+        "Dimensions": [
+          {
+            "Name": "AutoScalingGroupName",
+            "Value": "ep25-ASG-02"
+          }
+        ]
+      }
+    },
+    "alarmep25ASG02LowNetworkIn": {
+      "Type": "AWS::CloudWatch::Alarm",
+      "Properties": {
+        "ActionsEnabled": "true",
+        "ComparisonOperator": "LessThanOrEqualToThreshold",
+        "EvaluationPeriods": "1",
+        "MetricName": "NetworkIn",
+        "Namespace": "AWS/EC2",
+        "Period": "300",
+        "Statistic": "Maximum",
+        "Threshold": "50000.0",
+        "AlarmActions": [
+          "arn:aws:sns:eu-west-1:438317763711:ep25-note",
+          {
+            "Ref": "scalingep25DecreaseGroupSize"
+          }
+        ],
+        "Dimensions": [
+          {
+            "Name": "AutoScalingGroupName",
+            "Value": "ep25-ASG-02"
+          }
+        ]
+      }
+    },
+    "acl1": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Egress": "true",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "acl44523023"
+        }
+      }
+    },
+    "acl2": {
+      "Type": "AWS::EC2::NetworkAclEntry",
+      "Properties": {
+        "CidrBlock": "0.0.0.0/0",
+        "Protocol": "-1",
+        "RuleAction": "allow",
+        "RuleNumber": "100",
+        "NetworkAclId": {
+          "Ref": "acl44523023"
+        }
+      }
+    },
+    "subnetacl1": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl44523023"
+        },
+        "SubnetId": {
+          "Ref": "subnetaef52de7"
+        }
+      }
+    },
+    "subnetacl2": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl44523023"
+        },
+        "SubnetId": {
+          "Ref": "subneta835e7cf"
+        }
+      }
+    },
+    "subnetacl3": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl44523023"
+        },
+        "SubnetId": {
+          "Ref": "subnet253ae842"
+        }
+      }
+    },
+    "subnetacl4": {
+      "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+      "Properties": {
+        "NetworkAclId": {
+          "Ref": "acl44523023"
+        },
+        "SubnetId": {
+          "Ref": "subnetbff22af6"
+        }
+      }
+    },
+    "gw1": {
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "InternetGatewayId": {
+          "Ref": "igw06156f62"
+        }
+      }
+    },
+    "subnetroute1": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb03436964"
+        },
+        "SubnetId": {
+          "Ref": "subneta835e7cf"
+        }
+      }
+    },
+    "subnetroute2": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb03436964"
+        },
+        "SubnetId": {
+          "Ref": "subnetaef52de7"
+        }
+      }
+    },
+    "subnetroute3": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb2a755f4d"
+        },
+        "SubnetId": {
+          "Ref": "subnetbff22af6"
+        }
+      }
+    },
+    "subnetroute5": {
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties": {
+        "RouteTableId": {
+          "Ref": "rtb78745e1f"
+        },
+        "SubnetId": {
+          "Ref": "subnet253ae842"
+        }
+      }
+    },
+    "route1": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtb03436964"
+        }
+      }
+    },
+    "route2": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtb2a755f4d"
+        },
+        "GatewayId": {
+          "Ref": "igw06156f62"
+        }
+      },
+      "DependsOn": "gw1"
+    },
+    "route3": {
+      "Type": "AWS::EC2::Route",
+      "Properties": {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "RouteTableId": {
+          "Ref": "rtb78745e1f"
+        },
+        "GatewayId": {
+          "Ref": "igw06156f62"
+        }
+      },
+      "DependsOn": "gw1"
+    },
+    "dchpassoc1": {
+      "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+      "Properties": {
+        "VpcId": {
+          "Ref": "vpc00e83767"
+        },
+        "DhcpOptionsId": {
+          "Ref": "doptcf854eab"
+        }
+      }
+    },
+    "ingress1": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgdefault"
+        },
+        "IpProtocol": "-1",
+        "SourceSecurityGroupId": {
+          "Ref": "sgdefault"
+        },
+        "SourceSecurityGroupOwnerId": "438317763711"
+      }
+    },
+    "ingress2": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgep25WORDPRESSSG"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "80",
+        "ToPort": "80",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "ingress3": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgep25WORDPRESSSG"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "22",
+        "ToPort": "22",
+        "CidrIp": "103.22.239.228/32"
+      }
+    },
+    "ingress4": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgep25WORDPRESSSG"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "443",
+        "ToPort": "443",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "ingress5": {
+      "Type": "AWS::EC2::SecurityGroupIngress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgep25MYSQLSG"
+        },
+        "IpProtocol": "tcp",
+        "FromPort": "3306",
+        "ToPort": "3306",
+        "SourceSecurityGroupId": {
+          "Ref": "sgep25WORDPRESSSG"
+        },
+        "SourceSecurityGroupOwnerId": "438317763711"
+      }
+    },
+    "egress1": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgdefault"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress2": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgep25WORDPRESSSG"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    },
+    "egress3": {
+      "Type": "AWS::EC2::SecurityGroupEgress",
+      "Properties": {
+        "GroupId": {
+          "Ref": "sgep25MYSQLSG"
+        },
+        "IpProtocol": "-1",
+        "CidrIp": "0.0.0.0/0"
+      }
+    }
+  },
+  "Description": "ep25 MyVPC Infrastructure Template"
+}

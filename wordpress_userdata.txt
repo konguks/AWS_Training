@@ -1,0 +1,47 @@
+#!/bin/bash
+
+apt-get update -y
+
+apt-get install  apache2 -y
+
+apt-get install libapache2-mod-auth-mysql -y
+
+apt-get install php libapache2-mod-php php-mcrypt php-mysql -y
+
+service apache2 restart
+
+cd /home/ubuntu
+
+wget http://wordpress.org/latest.tar.gz
+
+tar -xzvf latest.tar.gz
+
+cp /home/ubuntu/wordpress/wp-config-sample.php /home/ubuntu/wordpress/wp-config.php
+
+sed -i "s/.*define('DB_NAME', 'database_name_here');.*/define('DB_NAME', 'wordpress');/" /home/ubuntu/wordpress/wp-config.php
+
+sed -i "s/.*define('DB_USER', 'username_here');.*/define('DB_USER', 'wordpressuser');/" /home/ubuntu/wordpress/wp-config.php
+
+sed -i "s/.*define('DB_PASSWORD', 'password_here');.*/define('DB_PASSWORD', 'Welcome#123');/" /home/ubuntu/wordpress/wp-config.php
+
+sed -i "s/.*define('DB_HOST', 'localhost');.*/define('DB_HOST', '10.0.1.100');/" /home/ubuntu/wordpress/wp-config.php
+
+echo "define('FORCE_SSL_ADMIN', true);" >> /home/ubuntu/wordpress/wp-config.php
+
+echo "if (strpos(\$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false)" >> /home/ubuntu/wordpress/wp-config.php
+
+echo "\$_SERVER['HTTPS']='on';" >> /home/ubuntu/wordpress/wp-config.php
+
+cp -r /home/ubuntu/wordpress/* /var/www/html
+
+rm /var/www/html/index.html
+
+echo "Wordpress Installation Complete at Terminal. Continue the remaining part on the browser"
+
+chown -R www-data:www-data /var/www/html
+
+service apache2 restart
+
+
+echo "Wordpress is now running ...."
+

@@ -1,0 +1,31 @@
+#!/bin/bash
+
+apt-get update -y
+
+debconf-set-selections <<< 'mysql-server mysql-server/root_password password TopSecret#123'
+
+debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password TopSecret#123'
+
+apt-get -y install mysql-server -y
+
+echo "Updating mysql configs in /etc/mysql/my.cnf."
+
+sed -i "s/.*bind-address.*/bind-address = 0.0.0.0/" /etc/mysql/mysql.conf.d/mysqld.cnf
+
+echo "Updated mysql bind address in /etc/mysql/my.cnf to 0.0.0.0 to allow external connections."
+
+echo "Assigning mysql user wordpressuser access on %."
+
+service mysql restart
+
+mysql -u root -pTopSecret#123 --execute "create database wordpress character set utf8 collate utf8_bin;"
+
+mysql -u root -pTopSecret#123 --execute "GRANT ALL PRIVILEGES ON wordpress.* TO 'wordpressuser'@'%' IDENTIFIED BY 'Welcome#123' with GRANT OPTION; FLUSH PRIVILEGES;" 
+
+echo "Assigned mysql user wordpressuser access on all hosts."
+
+service mysql restart
+
+echo "mysql is running ......"
+
+
