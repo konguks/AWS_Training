@@ -1,0 +1,31 @@
+Lab07.txt
+---------
+
+First cleaning exercise
+-----------------------
+Delete CloudFormer Stack
+Delete ep33 R53 record set
+Delete Auto Scaling Group
+Delete RDS instance ENSURE Final Snapshot created
+Delete SNS Subscription
+Delete SNS Topic
+Delete CloudWatch Alarms
+Delete Load Balancer
+Delete Target Group
+Delete Launch Configuration
+Delete VPC NAT Gateway
+Release EIP addresses
+Delete RDS subnet group
+Delete EC2 running and stopped instances
+Deregister ep33-WP-AMI
+Do NOT deregister ep33-WP-SSL-AMI
+Delete Volumes
+Delete Snapshots except the one that is referred by ep33-WP-SSL-AMI
+Delete VPC
+
+Recreate the VPC with the help of Cloud Formation Template
+----------------------------------------------------------
+
+Launch the ep33-WORDPRESS-CF.template
+Follow the template instructions
+[Note: CloudFormer is still a beta service. You may not get the expected results]

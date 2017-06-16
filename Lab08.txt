@@ -1,0 +1,50 @@
+Lab08.txt
+---------
+
+Elastic Beanstalk
+
+-- Console->Compute->ElasticBeanstalk
+-- Select create new application
+	-- App Name
+	-- Select Webserver environment
+	-- Choose a platform
+		-- .NET [Windows/IIS]
+	-- Sample Application
+	-- Choose more options
+		-- Modify Security to include Key Pair
+	-- Create Environment
+-- Once completed, click the the app URL to see the app running
+
+-- Connect to the Windows machine using RDP
+	-- need to provide Key Pair as input to get username/password
+-- See how the Automation scripts have loaded the .NET application on IIS [c:\inetpub\www\] 
+
+-- Elastic Beanstalk is using Cloud Formation templates to and stacks to manage infrastructure
+
+Cloud Formation
+
+Automation Scripts using JSON Template
+
+1. Start with sample templates
+
+	-- Google "AWS cloud formation sample templates"
+	-- Select AWS cloud formation sample site
+	-- Choose samples
+	-- Choose your region [cloud formation templates are region specific]
+	-- Select services
+	-- Select S3 Static Web Site template
+	-- Click view
+	-- Template opens in a new tab
+	-- Copy the contents
+	-- Paste it in a text editor: Sublime Text or NotePad++
+	-- Save it locally as eps-s3-website.template
+	-- Select Cloud Formation - Console->Management->CloudFormation
+	-- Create a new stack
+	-- Choose upload a new template to S3
+	-- Next the template is now running
+	-- Provide the details it asks, 
+		-- mainly the HostedZone: epsubhash.in
+	-- Create
+	-- You can see it is producing the following:
+		-- a new S3 bucket
+		-- a new cloudfront distribution

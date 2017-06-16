@@ -1,0 +1,133 @@
+Lab03.txt
+---------
+
+Goal: Create Distributed, Load-Balanced, Auto-Scaled, High-Available, Secured WordPress Application that has Web Server and DB Server separated
+
+Stage 1:
+
+Create Own VPC
+Why? 
+
+The default VPC has its main route table connected to IGW. This prevents us not to have private subnet.
+
+Console->Network->VPC
+
+Do not use Wizard
+
+Let us create manually
+
+Select Your VPCs
+
+Create VPC
+
+	-- vpc name: ep33-myvpc
+	-- CIDR block: 10.0.0.0/16 = 65531 IPs
+
+Use Filter to select only your VPC
+
+Create IGW
+Attach IGW to ep33-myvpc
+
+Create Subnets
+	-- private subnets [MySQL DB]
+		-- AZ-a
+			ep33-private-subnet-A - 10.0.1.0/24
+		-- AZ-b
+			ep33-private-subnet-B - 10.0.2.0/24
+	-- public subnets [WordPress Web Servers]
+		-- AZ-a
+			ep33-public-subnet-A - 10.0.3.0/24
+		-- AZ-b
+			ep33-public-subnet-B - 10.0.4.0/24
+
+Create NAT service [MySQL to get installed and additional patches]
+	-- IGW for both inbound and outbound traffic
+	-- NAT Gateway is for only outbound traffic and its return traffic
+	[SGs are stateful - it can remember if an incoming traffic is part of a return traffic]
+
+	[ACLs are stateless - it cannot remember any return traffics]
+
+	-- Create an EIP
+	-- Create NAT
+		-- associate it with ep33-A-public-subnet
+		-- associate the EIP
+		-- ep33-nat
+
+Create Route Tables
+
+	-- Main route table should not have any modifications, as a best practice
+	-- Public Route Tables - IGW
+		-- ep33-public-rt-A: ep33-public-subnet-A and Routing to Local and IGW [0.0.0.0/0]
+		-- ep33-public-rt-B: ep33-public-subnet-B and Routing to Local and IGW [0.0.0.0/0]
+	-- NAT Route Tables [NAT]
+		-- ep33-NAT-RouteTable: ep33-private-subnet-A and ep33-private-subnet-B Routing to Local and NAT [0.0.0.0/0]
+		
+Select Your VPC
+	-- Action: DNS Hostname: YES
+
+Your VPC is now ready for big plan
+
+Prepare Security Groups for Wordpress and MySQL servers
+
+	-- Prepare Wordpress SG
+		-- Name: ep33-WORDPRESS-SG
+		-- VPC: ep33-myvpc [not default VPC]
+		-- Inbound: 
+			-- HTTP - 80 - 0.0.0.0/0
+			-- SSH - 22 - MyIP
+
+	-- Prepare MySQL SG
+		-- Name: ep33-MySQL-sg
+		-- VPC: ep33-myvpc
+		-- Inbound:
+			-- MySQL/Aurora - 3306 - from ep33-WORDPRESS-SG
+
+Create MySQL DB
+	-- Launch Ubuntu 16.04 LTS
+	-- t2.micro
+	-- VPC: ep33-myvpc
+	-- subnet: ep33-private-subnet-A
+	-- Public IP: Disable
+	-- private IP: 10.0.1.100
+	-- Advanced: User Data
+		-- Copy paste MySQL installation shell script
+Create Wordpress Server
+	-- Launch Ubuntu 16.04 LTS
+	-- t2.micro
+	-- VPC: ep33-myvpc
+	-- subnet: ep33-public-subnet-A
+	-- Public IP: Enable
+	-- Advanced:
+		-- Copy paste Wordpress installation shell script
+		-- Ensure that the DB_HOST name: is 10.0.1.100
+After this one, you can view Wordpress page using public IP of Wordpress instance
+
+Complete Wordpress installation to complete the MySQL table creation
+
+Stop WP server
+Start WP server
+
+You will now see that the WP is not properly showing
+
+WP stores the the IP address of the first time instance as its site url and home url in MySQL DB
+
+We need to update
+
+Update as per the WordpressCustomization Text file
+
+To prevent future IP clashes, we need to have a sub domain name
+
+Go to Route 53 under Console->Network
+
+	-- Select Hosted Zones
+	-- Select epsubhash.in hosted zone
+	-- Create Recordset
+	-- Name: ep33 [.epsubhash.in]
+	-- IPv4
+	-- No Alias
+	-- Value: Public IP Address of WP server
+
+Now you can see your WP running with http://ep33.epsubhash.in
+
+Do not stop or terminate WP server and MYSQL server now....
+

@@ -1,0 +1,66 @@
+Lab11.txt
+----------
+
+Goal: Build a Docker image of a Microservice app using maven
+
+SSH to Docker Ubuntu instance
+
+-- Download todo-docker2.zip from s3 into your desktop
+
+	aws s3 cp s3://eplab/labnotes/todo-docker2.zip
+
+-- Upload todo-docker2.zip to Docker Ubuntu instance using WinSCP
+
+-- put it in your home directory
+
+-- unzip todo-docker2.zip
+
+-- change directory to todo-docker2
+
+-- vim pom.xml
+
+-- modify the artifact id: subhashtodo to vz36todo
+-- modify the docker.image.prefix: subhashtodo to yourname in small letters without any special characters and spaces
+
+-- save pom.xml
+
+-- navigate to src/main/resources
+-- edit application.properties
+
+insert:
+
+server.port=12345
+
+-- save properties file
+
+-- navigate src/main/docker
+
+-- edit Dockerfile
+
+-- change subhashtodo to vz36todo [leave remaining characters as it is]
+
+-- add a new line to insert:
+
+EXPOSE 12345
+
+-- save Dockerfile
+
+-- change directory to ~/todo-docker2
+
+-- Build Docker image
+
+-- sudo mvn package docker:build
+
+-- This will create epsubhash/ep33todo image
+
+-- To run
+
+-- sudo docker run -p 80:12345 epsubhash/ep33todo
+
+-- do not close the terminal
+
+-- On your desktop open the browser and enter your public ip address of Ec2 instance
+
+-- You will be able to see todo-docker2 Spring Boot Microservice running 
+
+-- END

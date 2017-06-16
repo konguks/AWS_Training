@@ -1,0 +1,58 @@
+#!/bin/bash
+
+apt-get update -y
+
+apt-get install python-pip -y
+
+runuser -l  ubuntu -c 'pip install awscli --user'
+
+echo "export PATH=\"$HOME/.local/bin:$PATH\"" >> .profile
+
+. .profile
+
+echo "AWS CLI installed successfully"
+
+apt-get install -y python-software-properties debconf-utils
+
+add-apt-repository -y ppa:webupd8team/java
+
+apt-get update -y
+
+echo "oracle-java8-installer shared/accepted-oracle-license-v1-1 select true" | debconf-set-selections
+
+apt-get install -y oracle-java8-installer
+
+java -version
+
+javac -version
+
+echo "java installed successfully"
+
+apt-get update -y
+
+apt-get install maven git -y
+
+apt-get remove docker docker-engine -y
+
+apt-get install apt-transport-https ca-certificates curl software-properties-common -y
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+
+apt-key fingerprint 0EBFCD88
+
+add-apt-repository   "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+apt-get update -y
+
+apt-get install docker-ce -y
+
+apt-cache madison docker-ce
+
+docker run hello-world
+
+echo "DOCKER_OPTS=\"-s devicemapper\""  >> /etc/default/docker
+
+echo "....... AWS CLI, Oracle JAVA 1.8.x, Maven, GIT, Docker installed successfully ......"
+
+
+

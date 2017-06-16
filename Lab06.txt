@@ -1,0 +1,20 @@
+Lab06.txt
+---------
+
+
+CloudFormer with Cloud Formation
+
+	CloudFormer will help you to create a template from the existing architecture starting from VPC to EC2
+
+	-- Create a new stack - ep33-CloudFormer
+	-- Select CloudFormer
+	-- Provide username/password for you to access the web-interface for you to select resources
+	-- Once the CloudFormer instance for preparing the template is created, click the public dns url
+	-- it is HTTPS page without SSL certificate, hence it might give some error on browser, ignore and proceed to see the web page
+	-- You are now inside a navigation mode to select resources in a hierarchical mode
+	-- Select resources and click next to select resources in the next level
+	-- Continue this until the last resource
+	-- Save the template - ep33-WORDPRESS-CF.template
+	-- You now have the template for running the same environment more than once
+
+

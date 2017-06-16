@@ -1,0 +1,297 @@
+Lab01.txt
+---------
+
+AWS cloud infrastructure 
+	-- Distributed Locations - Regiongs
+	-- CDC / VDC / GRID / CIS
+	-- APIs to access them
+	-- Console / CLI / SDK / Mobile to access these APIs through REST and SOAP web service requests
+	-- Only Authenticated and Authorized users alone can access these services
+	-- You need to subscribe an account to start with
+	-- Account User or AU has to sign up:
+		-- email ID
+		-- mobile phone
+		-- credit card
+
+	-- AU should not get into technology resource admin, though it is possile
+	-- AU should create IAM [Identity Access Management] user
+
+AU creating first IAM Admin user - eps
+
+	-- Console
+	-- Security, Identity & Compliance
+	-- IAM
+	-- User
+	-- Add user
+	-- user 
+		-- console 
+			[username/password] 
+			Web Console
+		-- and programatic access 
+			[accesskey / secretkey]
+			CLI access -- aws cli cmd
+			SDK access -- Java app
+	-- Policy -- Attached AdminAccess
+		-- JSON Object
+		-- Version - "2012-10-17"
+		-- Statement
+			-- Effect: Allow / Deny
+			-- Resource: *
+			-- Action: *
+	-- user created
+	-- AU has to share user / pass and AK/SK to the first IAM user eps
+-- IAM user eps received u/p and ak/sk
+-- eps can sign in using account level sign in url
+	-- https://epsubhash.signin.aws.amazon.com/console
+	-- is a customized sign in url that hides the account number
+-- eps has two options of access
+	-- Web Console
+		-- username
+		-- password
+	-- CLI
+		-- Download AWS CLI tools from AWS site and install on desktop
+		-- AWS configure
+			-- AccessKey
+			-- SecretKey
+			-- Default Region - us-east-1
+			-- Output format - table
+eps has to create 23 other admins
+	-- CLI
+		-- uses a shellscript [in linux or mac osx] or can use a powershell code if in Windows
+
+		#!/bin/sh
+
+		for i in {11..33}; do 
+			aws iam create-user --user-name ep$i;
+			aws iam create-login-profile --user-name ep$i --password Pass$i; 
+		done
+
+		-- the above code will create users and their passwords in bulk
+		-- But the users do not have any permissions
+		-- If any user logs in using the sign in url, they can view the console but will not be able to access any resource including the list of users etc.
+		-- eps now creates a group epadmins
+		-- group policy is set to AdminAccess
+		{
+			"Version" : "2012-10-17",
+			"Statement" : [
+				{
+					"Effect" : "Allow",
+					"Action" : "*",
+					"Resource" : "*"
+				}
+			]
+		}
+		-- Add users to epadmins group 
+
+		-- immediately the ep11 to ep36 users are now AWS admins for epsubhash account
+
+-- ep11 to ep33 users logged in
+-- Console->IAM
+-- Can see users
+-- We need to download AK/SK
+-- Click a user name
+-- Select Security Credentials tab
+-- Create Access Keys [AK/SK]
+-- Download CSV file
+-- On Desktop CLI
+	aws configure:
+	AK
+	SK
+	..
+	..
+-- On windows the crdentials and configuration are stored in .aws hidden folder within C:\Users\<<user>>
+
+Each now got their own regions
+
+Admins are going to create our first EC2 instance
+-- Log in to console
+-- Select the region either at main console or at EC2 dashboard
+-- Select EC2 dashboard
+-- Created a Security Group SG: ep33-DEFAULT-VPC-SG that has:
+	-- Inbound: Nothing
+	-- Outbound: All Traffic - TCP - 0-65535 - Anywhere: 0.0.0.0/0
+-- For the first admin to access Linux or Windows EC2 instance, we need to have SSH Public Key / Private Key - Key Pairs
+-- Two options:
+	-- You ask AWS to create Key Pairs
+		-- Select Key Pairs from EC2 Dashboard
+		-- Create a new Key Pair
+		-- Give a name - ep33
+		-- Download PEM file [ this needs to be converted to PPK file if you are using PuTTy connection]
+			-- use PuTTyGen to create both private key and public key
+			-- if you are using linux or Mac OSX you can use PEM file itself after chmod 0400 [r--------] to the PEM file and then using SSH
+	-- You can import Public Key from your system
+		-- if you are migrating your exisiting on-premises server into AWS, you may want to import an existing Key Pair from your org to AWS. 
+		-- You can import the public key
+		-- You still hold the private key with you
+Launch an EC2 instance Ubunutu 14.04 LTS HVM
+
+	-- EC2 Dashboard
+	-- Launch Instance
+	-- Dialog Box opens
+	-- Selection AMI
+	-- Quick View
+	-- Ubuntu 16.04 LTS HVM
+	-- Next to select Machine Type
+		-- t2: is a burstable machine type
+		-- t2.micro - 1 vCPU and 1 GiB memory
+	-- Instance configuration
+		-- Default VPC
+		-- AZ a / Any subnet
+		-- Public IP: Enable
+		-- Advanced Details
+			-- User data
+			---------------------------------------------
+			#!/bin/sh
+
+			echo "Username=admin" > mysecret.conf
+
+			echo "Password=Welcome#123" >> mysecret.conf
+
+			echo "Secret config file created"
+			
+
+			---------------------------------------------
+
+	-- Next to Storage
+	-- Next to Tag: not just info but also to access control and billing segregation
+	-- Select SG - ep33-default-SG
+		-- Warning: no access
+	-- Review
+	-- Launch
+	-- It will ask now you to specify your Key Pair
+	-- Select your key ep33 from drop down
+	-- Accept that you have access to the key file
+	-- Launch
+
+Connecting to the newly created Ubuntu instance
+
+	-- Using PuTTyGen, generate PPK from PEM file
+	-- Modify SG to include the inbound traffic:
+		-- SSH - TCP - 22 - MyIP is a temporary selection of your public IP: 103.202.23.21/32
+	-- Using PuTTy
+		-- Public IP address
+		-- SSH->Auth->PPK file name
+		-- Open
+		-- Login as: ubuntu
+		-- You will get standard user with Sudo power
+		-- You will not get root access
+Check Metadata
+	-- curl http://169.254.169.254/latest/meta-data
+
+Check Userdata
+	-- curl http://169.254.169.254/latest/user-data
+
+Install Apache
+	-- Unless SG Outbound: All Traffic 0.0.0.0/0 you will not be able to update or install software packages from EC2 instance
+	-- sudo apt-get update -y
+	-- sudo apt-get install apache2 -y
+Add HTTP to SG ->
+	-- HTTP - TCP - 80 - Anywhere
+Testing Web Page from a browser window or from the the instance terminal window itself
+	-- browser: http://<<ec2-public-IP>>
+	-- terminal: curl http://localhost
+
+We gave permission to one of the users of the same region
+	-- Select ep33-DEFAULT-VPC-SG
+	-- Select Inbound
+	-- Edit
+	-- Add Rule
+	-- Select HTTP
+	-- In the Source Fieled select the security group of the user to whom you are giving permission to access your web server
+		-- ep12-DEFAULT-VPC-SG
+	-- Save
+	-- The instance belonging to ep12-DEFAULT-VPC-SG can now connect to your Web Server using curl command
+
+We now want to access the web server from anywhere
+
+	-- Select your SG
+	-- Inbound
+	-- Edit
+	-- Select HTTP
+	-- Source is Anywhere - 0.0.0.0/0
+	-- Save
+
+Open a browser
+Enter the public IP of any of the instances from any regions can now access
+
+After this testing -- terminate the instance to save cost
+
+
+Create EC2 instance using CLI
+-----------------------------
+
+ami-80861296
+
+sg-60dfd11e
+
+B AZ - Public Subnet - subnet-29108504
+
+--security-group-ids 
+
+--associate-public-ip-address
+
+aws ec2 run-instances --image-id ami-80861296 --count 1 --instance-type t2.micro --security-group-ids sg-60dfd11e --key-name ep33 --subnet-id subnet-29108504 --associate-public-ip-address
+
+i-04004d447d9fbe712
+
+aws ec2 create-tags --resources i-04004d447d9fbe712 --tags Key=Name,Value=ep33-B-Ubuntu 
+
+aws ec2 modify-instance-attribute --instance-id i-0960a373404a789b5 --groups sg-10bf0f6e
+
+aws ec2 stop-instances --instance-ids i-0318df0cdd96f3b05
+
+aws ec2 start-instances --instance-ids i-0318df0cdd96f3b05
+
+aws ec2 describe-instances --instance-id i-04004d447d9fbe712 --query "Reservations[].Instances[].PublicIpAddress"
+
+aws ec2 describe-instances --instance-id i-0318df0cdd96f3b05 --query "Reservations[].Instances[].PrivateIpAddress"
+
+aws ec2 terminate-instances --instance-ids i-0318df0cdd96f3b05
+
+## Create a new EC2 instance without Public IP address##
+
+aws ec2 run-instances --image-id ami-772aa961 --count 1 --instance-type t2.micro --key-name ep33 --subnet-id subnet-29108504  --no-associate-public-ip-address
+
+
+CloudWatch
+----------
+
+PuTTY to Ubuntu instance
+
+sudo apt-get update
+sudo apt-get install unzip
+sudo apt-get install libwww-perl libdatetime-perl
+
+
+curl http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip -O
+
+
+unzip CloudWatchMonitoringScripts-1.2.1.zip
+
+rm CloudWatchMonitoringScripts-1.2.1.zip
+
+cd aws-scripts-mon
+cp awscreds.template awscreds.conf
+
+echo "AWSAccessKeyId=AKIAISG7VUBM6ZNRGCBA" > awscreds.conf 
+echo "AWSSecretKey=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" >> awscreds.conf 
+
+./mon-put-instance-data.pl --mem-util --verify --verbose
+
+crontab -e
+
+NaNo
+
+*/5 * * * * ~/aws-scripts-mon/mon-put-instance-data.pl --mem-used-incl-cache-buff --mem-util --disk-space-util --disk-path=/ --from-cron
+
+^X = Control+X to eXit - Save and Exit
+
+./mon-get-instance-stats.pl --recent-hours=12
+
+Open
+
+For Viewing, your custom metrics posted by the script are displayed with the prefix System/Linux.
+
+
+
+
