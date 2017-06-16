@@ -1,0 +1,81 @@
+Set # 1
+-------
+sudo apt-get install mysql-client -y
+
+mysql -u wordpressuser -pWelcome#123 -h 10.0.1.100
+
+mysql>
+
+use wordpress;
+
+select * from wp_options where option_id = 1 or option_id = 2;
+
+update wp_options set option_value='http://ep25.epsubhash.in' where option_id = 1 or option_id = 2;
+
+exit
+
+Set # 2
+---------
+
+This is to take a backup of MySQL DB before pushing this to RDS
+
+$ cd ~
+$
+mysqldump -u wordpressuser -pWelcome#123 -h 10.0.1.100 wordpress > wordpress.sql
+
+This is to restore remotely a MySQL DB
+
+Make note of your RDS endpoint without :3306
+
+ep25.cjzoto8bwmsw.eu-west-1.rds.amazonaws.com
+
+mysql -u wordpressuser -pWelcome#123 -h  ep25.cjzoto8bwmsw.eu-west-1.rds.amazonaws.com    wordpress < wordpress.sql
+
+
+[On RDS, wordpress db should already be there and the user credentials should have access]
+
+Connect to RDS MySQL service
+
+mysql -u wordpressuser -pWelcome#123 -h  ep25.cjzoto8bwmsw.eu-west-1.rds.amazonaws.com
+
+mysql>use wordpress;
+mysql>show tables;
+
+if all WP tables are present, the migration is complete.
+
+mysql>exit
+
+
+WP server$>
+
+Back in WP Server
+
+cd
+
+/home/ubuntu
+
+sudo vim wordpress/wp-config.php
+
+Update the DB_HOST: 
+
+	old value: 10.0.1.100 
+
+	new value: ep25.cjzoto8bwmsw.eu-west-1.rds.amazonaws.com
+
+save
+
+sudo cp wordpress/wp-config.php /var/www/html/
+
+DONE with the whole development
+-------------------------------
+
+
+
+
+
+
+
+
+
+
+
