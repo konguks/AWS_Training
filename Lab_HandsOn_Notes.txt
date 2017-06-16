@@ -1,0 +1,135 @@
+C:\Users\verizon>aws configure
+AWS Access Key ID [None]: AKIAJSSYMMLOVMNP3JLA
+AWS Secret Access Key [None]: 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
+Default region name [None]: us-east-1
+Default output format [None]: table
+
+C:\Users\verizon>aws ec2 describe-regions
+----------------------------------------------------------
+|                     DescribeRegions                    |
++--------------------------------------------------------+
+||                        Regions                       ||
+|+-----------------------------------+------------------+|
+||             Endpoint              |   RegionName     ||
+|+-----------------------------------+------------------+|
+||  ec2.ap-south-1.amazonaws.com     |  ap-south-1      ||
+||  ec2.eu-west-2.amazonaws.com      |  eu-west-2       ||
+||  ec2.eu-west-1.amazonaws.com      |  eu-west-1       ||
+||  ec2.ap-northeast-2.amazonaws.com |  ap-northeast-2  ||
+||  ec2.ap-northeast-1.amazonaws.com |  ap-northeast-1  ||
+||  ec2.sa-east-1.amazonaws.com      |  sa-east-1       ||
+||  ec2.ca-central-1.amazonaws.com   |  ca-central-1    ||
+||  ec2.ap-southeast-1.amazonaws.com |  ap-southeast-1  ||
+||  ec2.ap-southeast-2.amazonaws.com |  ap-southeast-2  ||
+||  ec2.eu-central-1.amazonaws.com   |  eu-central-1    ||
+||  ec2.us-east-1.amazonaws.com      |  us-east-1       ||
+||  ec2.us-east-2.amazonaws.com      |  us-east-2       ||
+||  ec2.us-west-1.amazonaws.com      |  us-west-1       ||
+||  ec2.us-west-2.amazonaws.com      |  us-west-2       ||
+|+-----------------------------------+------------------+|
+
+C:\Users\verizon>aws configure
+AWS Access Key ID [****************3JLA]:
+AWS Secret Access Key [****************Uol9]:
+Default region name [us-east-1]: eu-west-1
+Default output format [table]:
+
+52.214.58.177
+ubuntu
+
+103.22.239.228/32
+
+ubuntu@ip-172-31-33-209:~$ sudo apt-get update
+ubuntu@ip-172-31-33-209:~$ sudo apt-get install apache2
+ubuntu@ip-172-31-33-209:~$ curl http://localhost
+ubuntu@ip-172-31-33-209:~$ curl http://172.31.2.91 -- neighbour ip address
+Instance -- Actions -- Networking -- Change security group
+
+
+Availability Zone A
+--------------------
+Public DNS	ec2-52-214-100-68.eu-west-1.compute.amazonaws.com
+User name	Administrator
+Password	
+rwS.;SgXEE5azMg8pi&SFL@*jy9rofk%
+
+Availability Zone B
+--------------------
+Public DNS	ec2-52-215-26-36.eu-west-1.compute.amazonaws.com
+User name	Administrator
+Password	
+Z5@m$I)5*?HZHl4c4sZY$Bc6TA&Q(3d=
+
+VPC ID
+-------
+vpc-00e83767 | ep25-myvpc
+
+bhuvi
+bhuvi#123
+
+ep25.i-0ec5a690f557a4a93.eu-west-1.rds.amazonaws.com:3306
+
+epsubhash.signin.aws.amazon.com
+
+CloudFormation
+
+DBName : wordpressdb
+DBPassword : Welcome123
+DBRootPassword : bhuvi123
+DBUser : bhuvi
+
+DOCKER
+-------
+ubuntu@ip-172-31-39-224:~$ java -version
+ubuntu@ip-172-31-39-224:~$ javac -version
+ubuntu@ip-172-31-39-224:~$ mvn --version
+ubuntu@ip-172-31-39-224:~$ git --version
+ubuntu@ip-172-31-39-224:~$ aws  --version
+ubuntu@ip-172-31-39-224:~$ sudo docker info
+ubuntu@ip-172-31-39-224:~$ sudo docker run -it centos sh
+
+sudo -- admin
+docker -- root level
+run -- image
+it -- Interactive Terminal
+sh -- entry point
+
+sh-4.2# hostname -i
+172.17.0.2
+
+sh-4.2# yum install httpd
+sh-4.2# /usr/sbin/httpd -k start
+sh-4.2# curl http://172.17.0.2
+
+ubuntu@ip-172-31-39-224:~$ aws configure
+AWS Access Key ID [None]:
+AWS Secret Access Key [None]:
+Default region name [None]: us-east-1
+Default output format [None]: table
+
+ubuntu@ip-172-31-39-224:~$ aws ec2 describe-regions
+ubuntu@ip-172-31-39-224:~$ aws s3 ls
+ubuntu@ip-172-31-39-224:~$ aws s3 cp s3://eplab/labs/todo-docker2.zip .
+ubuntu@ip-172-31-39-224:~$ sudo apt install unzip
+ubuntu@ip-172-31-39-224:~$ unzip todo-docker2.zip
+ubuntu@ip-172-31-39-224:~$ cd todo-docker2/
+ubuntu@ip-172-31-39-224:~/todo-docker2$ vim pom.xml
+ubuntu@ip-172-31-39-224:~/todo-docker2$ cd src/main/resources/
+ubuntu@ip-172-31-39-224:~/todo-docker2/src/main/resources$ cat application.properties
+server.port=12345
+ubuntu@ip-172-31-39-224:~/todo-docker2/src/main/resources$ cd ../docker
+
+ubuntu@ip-172-31-39-224:~/todo-docker2/src/main/docker$ vim Dockerfile
+ubuntu@ip-172-31-39-224:~/todo-docker2/src/main/docker$ cat Dockerfile
+FROM java:8
+VOLUME /tmp
+ADD ep25todo-0.1.0.jar app.jar
+EXPOSE 12345
+RUN bash -c 'touch /app.jar'
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+
+ubuntu@ip-172-31-39-224:~/todo-docker2$ sudo mvn package docker:build
+ubuntu@ip-172-31-39-224:~/todo-docker2$ sudo docker run -p 80:12345 -it bhuviks/ep25todo
+
+ubuntu@ip-172-31-39-224:~/todo-docker2$sudo docker login
+ubuntu@ip-172-31-39-224:~/todo-docker2$sudo docker push bhuviks/ep25todo
