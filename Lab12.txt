@@ -1,0 +1,5 @@
+https://github.com/AndreuAntonio
+
+https://github.com/AndreuAntonio/chef-wp
+
+Deploy_software_wordpress_nginx-mysql56::default

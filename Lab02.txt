@@ -1,0 +1,97 @@
+Lab02.txt
+---------
+
+Creating 2 Windows Servers in 2 AZs and cloning and attaching EBS volumes from one AZ to another
+
+Use case: you have a Windows server running in one AZ and you have attached an additional EBS volume in which you have stored some critical data and apps. You want to make copy of this Volume and distribute to other instances in the same region but in different AZs
+
+-- Start 1 Windows server AZ-a
+-- Start another Windows Server in AZ-b
+
+-- Create a new Volume and attach to AZ-a server
+-- Connect to Windows server using RDP protocol
+-- Use Server manager to
+	-- Make the attached Volume Online
+	-- Make it formatted
+-- Install all necessary data or apps into the new volume
+
+-- Save all the contents
+
+-- On console
+	-- select the volume which in use on the Windows server AZ-a
+	-- Create a snap-shot - Point-in-Time - copy
+-- All snapshots are stored in S3 but not in your S3 space
+-- You will be accessing them only through Console-EC2->Snapshot facility or through CLI, you cannot use S3 Console or CLI to manage snapshots
+
+-- Create a new Volume with snapshot
+-- Create a new Volume
+-- Select your snapshot ID by searching either tag value or snapshot ID. [Snapshots are not limited to your private snaps, they may include publically available]
+
+
+++ Ubuntu Mount a fresh disk
+-------------------------
+
+Inside EC2 Console
+------------------
+EBS -> Volumes -> Add Volume in the same AZ
+
+Select Your Volume -> Attach Volume
+
+Inside EC2 instance [putty to the instance]
+----------------------------------
+lsblk
+
+sudo file -s /dev/xvda
+
+sudo file -s /dev/xvda1
+
+sudo file -s /dev/xvdb
+
+(Warning!!! the following command to be executed only for new volumes)
+
+sudo mkfs -t ext4 /dev/xvdf
+
+lsblk
+
+sudo file -s /dev/xvdf
+
+(Copy the UUID=xxxx-xxxx-xxxxx--xxxxxxx and paste it in a text file on your desktop machine)
+
+cd
+
+sudo mkdir mount_dir
+
+sudo cp /etc/fstab /etc/fstab.bak
+
+sudo vim /etc/fstab
+
+(insert following line by ESC i)
+
+UUID=4f1ef28b-6b57-4c52-b528-2668d1d8de72  /home/ubuntu/mount_dir ext4 defaults 0 0
+
+(save it by ESC :wq!)
+
+sudo mount /dev/xvdf
+
+df -Th
+
+cd mount_dir
+
+sudo touch a b c d e
+
+ls -al
+
+sudo reboot now
+
+(reconnect to this machine via puTTy)
+
+Detaching a volume
+------------------
+Inside ec2 instacne
+
+sudo umount -d /dev/xvdf
+
+Inside EC2 Console
+------------------
+EBS -> Volumes -> Select Your Volume -> Detach Volume
+

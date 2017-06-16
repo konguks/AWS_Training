@@ -1,0 +1,105 @@
+Lab05.txt
+---------
+
+Goal is to continue from Lab04 but in this we will look into AutoScaling and CloudWatch to work with Application Load Balancer
+
+-- We will start with no running instances of WP server
+
+-- MySQL is now running in RDS
+
+-- We will use the same ELB - ep33-app-elb and Target Group ep33-target in this exercise
+
+-- SNS Topic - Email Subscription
+	-- For receiving notifications from Auto Scaling
+
+AUTOSCALING
+---------------
+
+-- Create Auto Scaling with Application ELB integration
+	-- Create Launch Configuration
+		-- Select ep33-WP-SSL-AMI
+		-- No VPC selection - interesting??
+		-- Select Security Groups even from other VPCs -- interesting??
+		-- Select instance type
+		-- Ensure you have only Private IP for each instance -- though this is an internet facing application - Discuss
+	-- Auto Scaling
+		-- VPC
+		-- AZs
+		-- Public Subnets added in
+		-- ELB traffic
+		-- Selected ep33-targetgroup, no Classic ELB
+		-- Initial size - 2
+		-- Scaling Policy
+			-- Dynamically changing - Increase / Decrease
+				-- Min: 2
+				-- Max: 4
+				-- Increase Policy
+					-- Alarm: Max-NetworkIn>=150000
+					-- Notify: SNS email
+					-- Action: Add 1 instance
+				-- Decrese Policy
+					-- Alarm: Max-NeworkIn<=20000
+					-- Notify: SNS email
+					-- Action: Remove 1 instance
+			-- Other notifications optional
+			-- Launch
+		-- Check AutoScaling Health and ELB Health are positive to ensure the instances are reachable
+
+SSL Management
+-----------------
+
+1. Launch a new instance from ep33-WP-AMI
+	-- into ep33-myvpc, 
+	-- public subnet, 
+	-- public IP disable
+	-- include the following code into User Data
+------------------------------------------------------------
+#!/bin/bash
+
+echo "define('FORCE_SSL_ADMIN', true);" >> /var/www/html/wp-config.php
+
+echo "if (strpos(\$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false)" >> /var/www/html/wp-config.php
+
+echo "\$_SERVER['HTTPS']='on';" >> /var/www/html/wp-config.php
+
+chown -R www-data:www-data /var/www/html
+
+echo "HTTPS / SSL enabling on WordPress Done"
+
+
+------------------------------------------------------------
+	
+	-- Tag: ep33-change-WP
+	-- Your key pair
+2. Make these changes:
+	-- Change Route 53 pointing to the Public IP
+3. Browser - ep33.epsubhash.in
+4. Log in to WP as admin / Welcome#123 [or whatever admin/password you have set for the Wordpress Site]
+
+5. Select Plugin
+6. Click Add Plugins
+7. Search for "SSL Insecure Content Fixer"
+8. When this plugin appears, click install, ACTIVATE
+9. ACTIVATE the plugin
+
+10. Stop EC2 instance
+11. Create a new AMI - ep33-WP-SSL-AMI
+12. ... No action ....
+13. Ensure ELB SG has the following Inbound rules
+	-- HTTP 80 0.0.0.0
+	-- HTTPS 443 0.0.0.0
+14. ELB listener
+	-- ELB: HTTPS 443  Instance: HTTP 80
+17. Terminate existing EC2 instances of ASG
+18. Wait for new instances to start
+
+
+-- Ensure
+
+You have a WP installed and the HTTPS plugin installed and activated
+
+AWS SSL certificate is an internal certificate
+
+This has been enabled for *.epsubhash.in [all sub domains]
+
+

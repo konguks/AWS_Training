@@ -1,0 +1,74 @@
+Lab04.txt
+---------
+
+Continue with WP activities as given in the Lab03
+
+WP configuration is now pointing to MySQL private EC2 instance at 10.0.1.100
+
+When Loadbalancer and AutoScaling come, the DB server might not be able to take the load
+
+MySQL server requires to be moved RDS services or similar powerful DB services
+
+Create RDS instance
+
+-- Console->Database->RDS
+-- Select Subnet Group
+-- Create a Subnet Group
+	-- Name: ep33-subnet-group
+	-- VPC: ep33-myvpc
+	-- Need two AZs
+		-- AZ-a: ep33-a-private-subnet
+		-- AZ-b: ep33-b-private-subnet
+	-- You need subnet group to define where you need your Multi-AZ DB replication distribution
+-- Select RDS Launch
+-- Select MySQL
+-- Select Dev/Test
+-- Select DB info: 5.6.x
+-- Multi-AZ
+-- Provide DB credentials
+-- VPC: ep33-myvpc
+-- Subnet-group: ep33-subnet-group
+-- SG: ep33-MySQL-SG
+-- Public?:NO
+-- Backup window / Patch Window .....
+-- Launch
+-- This will produce Endpoint DNS Name
+
+-- Use DNS name in the WP config file
+
+-- Backup MySQL DB from 10.0.1.100 using mysqldump
+-- Restore back up file into RDS [see Wordpress Customization text document]
+-- Ensure that WordPress EC2 server is now pointing to RDS and NOT to the MySQL DB EC2 server runs @ 10.0.1.100
+
+-- MySQL EC2 server can be terminated
+
+-- WordPress EC2 server to be stopped
+
+-- Create AMI out of WP server - ep33-WP-AMI
+
+-- Security Groups are to be modified
+
+-- Modify security group for ELB inbound: ep33-Wordpress-SG
+	-- HTTP - 80 - 0.0.0.0/0 : 
+	-- HTTPS - 443 - 0.0.0.0/0 : 
+	-- SSH - 22 - MyIP
+	
+
+Launch 2 instances each from ep33-WP-AMI in:
+	 subnet Public-A - Tag: ep33-A-WP-Instance - and 
+	 subnet Public-B - Tag: ep33-B-WP-Instance
+
+	 Doubly ensure you do NOT have public IP address to both the instances
+
+Create Application ELB ep33-app-elb
+Create new Target group ep33-targetgroup
+
+Select add to Registered those 1+1 instances as targets
+
+
+Map ELB DNS for ep33-app-elb with Route 53 subdomain: ep33.epsubhash.in using Alias option
+
+Check you are able to see your WP app without any problem on Browser
+
+
+

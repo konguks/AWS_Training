@@ -1,0 +1,207 @@
+Lab09.txt
+---------
+
+S3 in detail:
+
+Object Store = name = value
+
+value = stream of bytes
+
+S3 cannot be used as a mountable file system
+ -- workaround: S3 Fuse is available at your risk
+
+s3 has 3 types of storage
+	-- Standard - one object has been copied to all AZs for high availability
+	-- Standard - Infrequent Access - all standard features, but less priced because for each retrieval, it charges
+	-- Reduced Redundancy - object is not guaranted to be made high avaialble. If you are ok, you may choose. Less cost
+
+In addition to S3, you may use Glacier as an archival storage - where access time might take over 4-5 hours
+
+Versioning 
+	-- can help you to prevent from accidental deletions
+	-- also helps to manage multiple versions for your system
+	-- each version costs you separately
+	-- you have to enable first to get versioning for the  bucket 
+	-- once versioning enabled, you can only suspended
+Lifecycle
+	-- versioning should be enabled if you want lifecyle rules
+	-- Rules
+		-- From Standard to Standard-IA - min 30 days need to be in Standard
+		-- From Standard-IA to Glacier - min 60 days after creation 
+		-- From Glacier to expired one after putting into Glacier
+
+Preparation for Exam
+
+During your preparation for examination create a note that captures most of what is needed for your learning. Here is a sample
+
+AWS S3
+	- Simple Storage Service
+	- Scalable Storage Service
+	- Object Storage
+	- One of the earliest services
+	- In conjunction with other services
+		-- Kinesis - durable target storage
+		-- EMR - durable target storage
+		-- EBS - storage
+		-- RDS - snapshots
+		-- Redshift - loading or staging
+		-- DynamoDB - loading or staging
+	- Common use cases
+		-- Backup and archive
+		-- Content, media
+		-- Big data analytics
+		-- Static website
+		-- Cloud-native mobile and Internet apps
+		-- DR
+	- Storage Classes
+		-- General Purpose - Standard
+		-- Standard Infrequent Access [IA]
+		-- Archive - Glacier
+	- Lifecycle
+		-- rules
+		-- automatically migrate from class to another
+		-- Standard to Standard IA to Glacier to DELETE
+	- Glacier 
+		-- archieve
+		-- cold data
+		-- 3 to 5 hours for retrieval
+	- Storage
+		-- Block storage
+		-- File storage
+		-- Object storage - S3
+			--- Independent of a server
+			--- Accessed over Internet
+			--- Files as Objects - K/V
+			--- Accessed via API on HTTP
+	- S3 Bucket 
+		-- containers
+		-- flat folders
+		-- key [bucketname]
+		-- global namespace much like DNS
+		-- Access not limited to Region or Account
+		-- 63 lowercase letters, numbers, hyphens and periods
+		-- Global access / Regional storage
+		-- Cross regional replication
+		-- No sub-buckets
+		-- Unlimited Objects
+	- S3 Object
+		-- Resides inside Buckets
+		-- 0 byte to 5 TB
+		-- K / V
+		-- K
+			--- filename
+			--- upto 1024 bytes
+			--- UTF8
+			--- embedded slashes - backslashes - dots - dashes
+			--- must be unique within buckets
+		-- V - file [data portion of object]
+		-- Data part of S3 is opaque to S3
+		-- Metadata for each object
+			--- two types of metadata
+			--- system meta
+				---- created by S3
+				---- date modified
+				---- size
+				---- MD5 digest
+				---- HTTP content type
+			--- user meta
+				---- Optional
+				---- only at the time of creation
+				---- tags
+		-- Object URL
+			--- webservices endpoint
+			--- bucket name
+			--- object key
+		-- GET / PUT
+			--- operating on the whole object at once
+			--- instead of incrementally updating portions as with file
+	- Special characteristics of S3
+		-- No mounting
+		-- No Open an object
+		-- No install OS
+		-- Unlimited space
+		-- Durability
+			--- S3 Objects are automatically replicated 
+			--- on multiple devices in multiple facilities 
+				---- [AZs ??] 
+			--- within a region
+		-- Scalability
+			--- When request rate grows ....
+			--- automatically partitions buckets
+			--- for better concurrency
+	- S3 Operations
+		-- Create / delete bucket
+		-- Write / Read / Delete Object
+		-- List keys in bucket
+	- REST
+		-- HTTP or HTTPS
+		-- CRUD
+		-- Create
+			--- HTTP PUT
+			--- HTTP POST sometimes [via browser form data]
+		-- Read
+			--- HTTP GET
+		-- Update
+			--- HTTP POST
+			--- HTTP PUT sometimes
+	- SOAP
+		-- Still used
+		-- But should avoid
+	- Durability
+		-- predictability of its existence in the future
+		-- 11 9's
+		-- 99.999999999% in a year
+	- Availability
+		-- predictability of accessibility
+		-- 99.99% in a year
+	-- RRS
+		-- Reduced Redundancy
+		-- 99.99% durability in a year
+		-- one that you can afford to miss
+		-- or, recreatable
+	-- Data Consistency
+		-- Eventually consistent
+		-- writing into several devices
+		-- PUT new objects - read-after-write - immediately
+		-- PUT old object / DELETE - eventually consistent
+	-- ACL
+		-- bucket or object
+		-- Coarse grained
+			--- S3 Access Control List [S3 ACL]
+			--- READ
+			--- WRITE
+			--- FULL-CONTROL
+			--- Legacy
+			--- before IAM introduced
+			--- limited use cases - ex: logging static website
+		-- Fine grained
+			--- S3 Bucket Policies
+				--- recommended ACL
+				--- Similar to IAM but different:
+					---- associated to bucket NOT to IAM principal
+					---- allow cross-account access [*]
+					---- allow CIDR / IP at what time during day
+			--- IAM Policies
+				--- IAM principals that grant access to S3
+			--- Query String authentication
+	- Static Website
+		-- Good with client-side scripting
+		-- Not suitable for server-side scripts
+	- S3 Delimiters
+		-- Though uses a flat structure, it allows delimiter params
+		-- delimiters to retrieve objects hierarchically
+			--- slash [/]
+			--- backslash [\]
+		-- supported by
+			--- REST API
+			--- Wrapper SDKs
+			--- AWS CLI
+			--- Console
+		-- delimiteres give you an impression of a filesystem
+		-- But NOT a filesystem
+	- Storage Classes
+		-- 
+		— end of file
+
+
+	
